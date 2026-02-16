@@ -26,3 +26,12 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.name
+
+class Contact(models.Model):
+    name = models.CharField(max_length=200)
+    phone = PhoneNumberField()
+    email = models.EmailField()
+    message = models.TextField()
+
+    def __str__(self):
+        return self.name
