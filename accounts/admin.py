@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Company, Profile
+from .models import Company, Profile, Contact
 from django.utils.html import format_html
 
 # Register your models here.
@@ -42,3 +42,14 @@ class ProfileAdmin(admin.ModelAdmin):
             )
         return '--'
     preview_avatar.short_description = 'avatar'
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    model = Contact
+    
+    list_display = ['id', 'name', 'phone', 'email', 'message']
+    list_display_links = ['id', 'name']
+    list_filter = ['name']
+    list_per_page = 10
+    search_fields = ['name', 'phone', 'message']
+    ordering = ['name']
