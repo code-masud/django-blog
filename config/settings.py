@@ -41,12 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'bootstrap5'
+    'bootstrap5',
     'crispy_forms',
     'crispy_bootstrap5',
-    "phonenumber_field",
+    'phonenumber_field',
 
     'blog.apps.BlogConfig',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
