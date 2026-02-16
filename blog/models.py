@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.db import transaction
+from django.core.validators import MinLengthValidator
 
 class SoftDeleteQuerySet(models.QuerySet):
 
@@ -103,8 +104,8 @@ class SoftDeleteMixin(models.Model):
         self.save(update_fields=["is_deleted", "deleted_at", "deleted_by"])
 
 class Category(SoftDeleteMixin, models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200)
+    name = models.CharField(max_length=200, validators=[MinLengthValidator(3)])
+    slug = models.SlugField(max_length=200, validators=[MinLengthValidator(3)])
     description = models.TextField(help_text='Short description')
     is_active = models.BooleanField(default=True)
 
@@ -128,13 +129,13 @@ class Category(SoftDeleteMixin, models.Model):
         return super().save(*args, **kwargs)
 
 class Tag(SoftDeleteMixin, models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200)
+    name = models.CharField(max_length=200, validators=[MinLengthValidator(3)])
+    slug = models.SlugField(max_length=200, validators=[MinLengthValidator(3)])
     description = models.TextField(help_text='Short description')
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name_plural = 'Categories'
+        verbose_name_plural = 'Tags'
         ordering = ['name']
         constraints = [
             models.UniqueConstraint(fields=['name', 'slug'], condition=Q(is_active=True), name='tag_unique_name_slug')
@@ -158,8 +159,8 @@ class Post(SoftDeleteMixin, models.Model):
         PUBLISHED = 'PB', 'Published'
         ARCHIVE = 'AR', 'Archive'
     
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200)
+    title = models.CharField(max_length=200, validators=[MinLengthValidator(5)])
+    slug = models.SlugField(max_length=200, validators=[MinLengthValidator(5)])
     excerpt = models.TextField(help_text="Brief summary for listings", max_length=300)
     content = models.TextField()
     featured_image = models.ImageField(upload_to=post_upload_path, blank=True, null=True, validators=[image_validation])
