@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.forms import ModelForm
+from django.http import HttpRequest
 from .models import Category, Tag, Comment, Post
 
 
@@ -13,6 +15,35 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ['title', 'slug', 'content']
     filter_horizontal = ['categories', 'tags']
     ordering = ['-published_at']
+
+    prepopulated_fields = {'slug': ('title',)}
+    raw_id_fields = ('author',)
+    date_hierarchy = 'published_at'
+
+    fieldsets = (
+        ('Main Content', {
+            'fields': ('title', 'slug', 'excerpt', 'content', 'featured_image')
+        }),
+        ('Label Specifications', {
+            'fields': ('substrate', 'printing_technology', 'finishing_techniques'),
+            'classes': ('collapse',)
+        }),
+        ('Categorization', {
+            'fields': ('categories', 'tags')
+        }),
+        ('Publication Settings', {
+            'fields': ('author', 'published_at',)
+        }),
+        ('SEO', {
+            'fields': ('meta_title', 'meta_description'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            self.author = request.user
+        return super().save_model(request, obj, form, change)
     
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -25,6 +56,14 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'slug', 'description']
     ordering = ['name']
 
+    prepopulated_fields = {'slug': ('name',)}
+
+    fieldsets = (
+        ('Main Content', {
+            'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+    )
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     model = Tag
@@ -36,13 +75,36 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ['name', 'slug', 'description']
     ordering = ['name']
 
+    prepopulated_fields = {'slug': ('name',)}
+
+    fieldsets = (
+        ('Main Content', {
+            'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+    )
+
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     model = Comment
 
-    list_display = ['id', 'post', 'user', 'text', 'is_approved']
+    list_display = ['id', 'short_text', 'post', 'user', 'is_approved']
     list_display_links = ['id', 'post']
     list_filter = ['is_approved']
     list_per_page = 10
-    search_fields = ['post', 'user', 'text']
+    search_fields = ['post__title', 'user__username', 'text']
     ordering = ['post']
+    actions = ['approve_comments']
+
+    fieldsets = (
+        ('Main Content', {
+            'fields': ('post', 'user', 'text', 'is_approved')
+        }),
+    )
+
+    def short_text(self, obj):
+        return obj.text[:10] + '...' if len(obj.text) > 10 else obj.text
+    short_text.short_description = 'Comment'
+
+    def approve_comments(self, request, queryset):
+        queryset.update(is_approved=True)
+    approve_comments.short_description = 'Approve selected comments'
