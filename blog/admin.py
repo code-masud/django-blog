@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from django.http import HttpRequest
 from .models import Category, Tag, Comment, Post
-
+from django.utils import timezone
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -43,7 +43,13 @@ class PostAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             self.author = request.user
+            self.created_by = request.user
+        else:
+            self.updated_by = request.user
         return super().save_model(request, obj, form, change)
+    
+    def delete_model(self, request, obj):
+        obj.delete(user=request.user)
     
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -64,6 +70,16 @@ class CategoryAdmin(admin.ModelAdmin):
         }),
     )
 
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            self.created_by = request.user
+        else:
+            self.updated_by = request.user
+        return super().save_model(request, obj, form, change)
+    
+    def delete_model(self, request, obj):
+        obj.delete(user=request.user)
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     model = Tag
@@ -82,6 +98,16 @@ class TagAdmin(admin.ModelAdmin):
             'fields': ('name', 'slug', 'description', 'is_active')
         }),
     )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            self.created_by = request.user
+        else:
+            self.updated_by = request.user
+        return super().save_model(request, obj, form, change)
+    
+    def delete_model(self, request, obj):
+        obj.delete(user=request.user)
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
@@ -108,3 +134,13 @@ class CommentAdmin(admin.ModelAdmin):
     def approve_comments(self, request, queryset):
         queryset.update(is_approved=True)
     approve_comments.short_description = 'Approve selected comments'
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            self.created_by = request.user
+        else:
+            self.updated_by = request.user
+        return super().save_model(request, obj, form, change)
+    
+    def delete_model(self, request, obj):
+        obj.delete(user=request.user)
