@@ -1,17 +1,12 @@
-
-from typing import Any
 from django.contrib import admin
-from django.http import HttpRequest
-from .models import Category, Tag, Comment, Post
+from .models import Category, Tag, Comment, Article
 from django.utils.html import format_html
 from config.admin import AuditAdminMixin
-from django.urls import path, reverse
-from django.shortcuts import redirect
-from django.contrib import messages
+from django.utils import timezone
 
-@admin.register(Post)
-class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
-    model = Post
+@admin.register(Article)
+class ArticleAdmin(AuditAdminMixin, admin.ModelAdmin):
+    model = Article
 
     list_display = ('id', 'preview_image', 'title', 'status',)
     list_display_links = ('id', 'title')
@@ -21,27 +16,30 @@ class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
     filter_horizontal = ('categories', 'tags')
     ordering = ('-published_at',)
 
-    prepopulated_fields = {'slug': ('title',)}
+    seo_fields = ['slug', 'meta_title', 'meta_description', 
+          'meta_keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description']
+    
+    prepopulated_fields = {field: ('title',) for field in seo_fields}
     raw_id_fields = ('author', 'created_by', 'updated_by', 'deleted_by')
     date_hierarchy = 'published_at'
-    actions = ('published_posts', )
+    actions = ('published_articles', )
 
     fieldsets = (
         ('Main Content', {
-            'fields': ('title', 'slug', 'excerpt', 'content', 'featured_image')
-        }),
-        ('Label Specifications', {
-            'fields': ('substrate', 'printing_technology', 'finishing_techniques'),
-            'classes': ('collapse',)
+            'fields': ('title', 'slug', 'content', 'featured_image',)
         }),
         ('Categorization', {
             'fields': ('categories', 'tags')
         }),
         ('Publication Settings', {
-            'fields': ('author', 'published_at',)
+            'fields': ('status', 'author', 'published_at',)
         }),
-        ('SEO', {
-            'fields': ('meta_title', 'meta_description'),
+        ('Statistics', {
+            'fields': ('views', 'likes',),
+            'classes': ('collapse',)
+        }),
+        ('SEO',{
+            'fields': ('meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'og_title', 'og_description', 'og_image','twitter_title', 'twitter_description', 'twitter_image'),
             'classes': ('collapse',)
         }),
         ('Soft Delete',{
@@ -59,11 +57,11 @@ class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
             )
         return '--'
     
-    @admin.action(description='Published selected Posts')
-    def published_posts(self, request, queryset):
-        qs = queryset.exclude(status=Post.Status.PUBLISHED)
-        count = qs.update(status=Post.Status.PUBLISHED)
-        self.message_user(request, f'{count} posts status updated successfully.')
+    @admin.action(description='Published selected Articles')
+    def published_articles(self, request, queryset):
+        qs = queryset.exclude(status=Article.Status.PUBLISHED)
+        count = qs.update(status=Article.Status.PUBLISHED, published_at=timezone.now())
+        self.message_user(request, f'{count} articles published successfully.')
     
 @admin.register(Category)
 class CategoryAdmin(AuditAdminMixin, admin.ModelAdmin):
@@ -76,11 +74,17 @@ class CategoryAdmin(AuditAdminMixin, admin.ModelAdmin):
     search_fields = ('name', 'slug', 'description')
     ordering = ('name',)
 
-    prepopulated_fields = {'slug': ('name',)}
+    seo_fields = ['slug', 'description', 'meta_title', 'meta_description', 
+          'meta_keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description']
+    prepopulated_fields = {field: ('name',) for field in seo_fields}
 
     fieldsets = (
         ('Main Content', {
             'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+        ('SEO',{
+            'fields': ('meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'og_title', 'og_description', 'og_image','twitter_title', 'twitter_description', 'twitter_image'),
+            'classes': ('collapse',)
         }),
         ('Soft Delete',{
             'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
@@ -99,11 +103,17 @@ class TagAdmin(AuditAdminMixin, admin.ModelAdmin):
     search_fields = ('name', 'slug', 'description')
     ordering = ('name',)
 
-    prepopulated_fields = {'slug': ('name',)}
+    seo_fields = ['slug', 'description', 'meta_title', 'meta_description', 
+          'meta_keywords', 'og_title', 'og_description', 'twitter_title', 'twitter_description']
+    prepopulated_fields = {field: ('name',) for field in seo_fields}
 
     fieldsets = (
         ('Main Content', {
             'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+        ('SEO',{
+            'fields': ('meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'og_title', 'og_description', 'og_image','twitter_title', 'twitter_description', 'twitter_image'),
+            'classes': ('collapse',)
         }),
         ('Soft Delete',{
             'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
@@ -115,17 +125,21 @@ class TagAdmin(AuditAdminMixin, admin.ModelAdmin):
 class CommentAdmin(AuditAdminMixin, admin.ModelAdmin):
     model = Comment
 
-    list_display = ('id', 'short_text', 'post', 'user', 'is_approved')
-    list_display_links = ('id', 'post')
+    list_display = ('id', 'short_text', 'article', 'user', 'is_approved')
+    list_display_links = ('id', 'article')
     list_filter = ('is_approved',)
     list_per_page = 10
-    search_fields = ('post__title', 'user__username', 'text')
-    ordering = ('post',)
+    search_fields = ('article__title', 'user__username', 'text')
+    ordering = ('article',)
     actions = ('approve_comments',)
 
     fieldsets = (
         ('Main Content', {
-            'fields': ('post', 'user', 'text', 'is_approved')
+            'fields': ('article', 'user', 'text', 'is_approved')
+        }),
+        ('SEO',{
+            'fields': ('meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'og_title', 'og_description', 'og_image','twitter_title', 'twitter_description', 'twitter_image'),
+            'classes': ('collapse',)
         }),
         ('Soft Delete',{
             'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
