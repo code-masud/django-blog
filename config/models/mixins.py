@@ -3,6 +3,8 @@ from django.db import models, transaction
 from django.conf import settings
 from django.utils import timezone
 from ..managers import AuditSoftDeleteManager
+from services.image_validator import image_validation
+from services.upload_path import seo_upload_path
 
 class AuditSoftDeleteMixin(models.Model):
     created_by = models.ForeignKey(
@@ -55,3 +57,23 @@ class AuditSoftDeleteMixin(models.Model):
 
     def hard_delete(self, using=None, keep_parents=False):
         return super().delete(using=using, keep_parents=keep_parents)
+    
+class SEOMixin(models.Model):
+    # Meta SEO
+    meta_title = models.CharField(max_length=255, blank=True, help_text="Max 255 characters for SEO")
+    meta_description = models.TextField(blank=True, help_text="Max 500 characters for SEO")
+    meta_keywords = models.CharField(max_length=255, blank=True, help_text="Comma-separated keywords")
+    canonical_url = models.URLField(blank=True, help_text="Leave empty to use default post URL")
+
+    # OpenGraph
+    og_title = models.CharField(max_length=255, blank=True)
+    og_description = models.TextField(blank=True)
+    og_image = models.ImageField(upload_to=seo_upload_path, blank=True, validators=[image_validation])
+
+    # Twitter
+    twitter_title = models.CharField(max_length=255, blank=True)
+    twitter_description = models.TextField(blank=True)
+    twitter_image = models.ImageField(upload_to=seo_upload_path, blank=True, validators=[image_validation])
+
+    class Meta:
+        abstract = True
