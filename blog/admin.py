@@ -13,7 +13,7 @@ from django.contrib import messages
 class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
     model = Post
 
-    list_display = ('id', 'preview_image', 'title', 'status', 'restore_button',)
+    list_display = ('id', 'preview_image', 'title', 'status',)
     list_display_links = ('id', 'title')
     list_filter = ('published_at', 'status')
     list_per_page = 10
