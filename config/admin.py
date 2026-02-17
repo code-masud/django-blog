@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 class AuditAdminMixin:
 
@@ -27,19 +28,19 @@ class AuditAdminMixin:
         return actions
     
     def get_list_display(self, request):
-        base_display = super().get_list_display(request)
-        audit_display = ('is_deleted',)
-        return base_display + audit_display
+        return super().get_list_display(request) + ('is_deleted', 'deleted_status',)
 
     def get_list_filter(self, request):
-        base_filters = super().get_list_filter(request)
-        audit_filters = ('is_deleted', 'created_at', 'updated_at', 'deleted_at')
-        return base_filters + audit_filters
+        return super().get_list_filter(request) + ('is_deleted', 'created_at', 'updated_at', 'deleted_at')
 
     def get_readonly_fields(self, request, obj):
-        base = super().get_readonly_fields(request, obj)
-        audit = ('created_at', 'updated_at')
-        return base + audit
+        return super().get_readonly_fields(request, obj) + ('created_at', 'updated_at')
+    
+    @admin.display(description="Delete Status")
+    def deleted_status(self, obj):
+        if obj.is_deleted:
+            return format_html('<span style="color:red;font-weight:bold;">Deleted</span>')
+        return "Active"
     
     def get_queryset(self, request):
         return self.model.all_objects.all()
