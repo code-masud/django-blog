@@ -19,6 +19,7 @@ class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     raw_id_fields = ('author',)
     date_hierarchy = 'published_at'
+    readonly_fields = ('created_at', 'updated_at')
 
     fieldsets = (
         ('Main Content', {
@@ -38,14 +39,18 @@ class PostAdmin(admin.ModelAdmin):
             'fields': ('meta_title', 'meta_description'),
             'classes': ('collapse',)
         }),
+        ('Soft Delete',{
+            'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
+            'classes': ('collapse',)
+        })
     )
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
-            self.author = request.user
-            self.created_by = request.user
+            obj.author = request.user
+            obj.created_by = request.user
         else:
-            self.updated_by = request.user
+            obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
     
     def delete_model(self, request, obj):
@@ -72,9 +77,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
-            self.created_by = request.user
+            obj.created_by = request.user
         else:
-            self.updated_by = request.user
+            obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
     
     def delete_model(self, request, obj):
@@ -101,9 +106,9 @@ class TagAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
-            self.created_by = request.user
+            obj.created_by = request.user
         else:
-            self.updated_by = request.user
+            obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
     
     def delete_model(self, request, obj):
@@ -137,9 +142,9 @@ class CommentAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
-            self.created_by = request.user
+            obj.created_by = request.user
         else:
-            self.updated_by = request.user
+            obj.updated_by = request.user
         return super().save_model(request, obj, form, change)
     
     def delete_model(self, request, obj):
