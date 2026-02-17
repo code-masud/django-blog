@@ -1,14 +1,16 @@
 from django.contrib import admin
+from django.db.models.query import QuerySet
 from django.forms import ModelForm
 from django.http import HttpRequest
 from .models import Category, Tag, Comment, Post
 from django.utils import timezone
+from django.utils.html import format_html
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     model = Post
 
-    list_display = ['id', 'title', 'slug', 'featured_image', 'status']
+    list_display = ['id', 'preview_image', 'title', 'status', 'created_by', 'created_at', 'updated_by', 'updated_at', 'is_deleted', 'deleted_by', 'deleted_at']
     list_display_links = ['id', 'title']
     list_filter = ['published_at', 'status']
     list_per_page = 10
@@ -17,9 +19,10 @@ class PostAdmin(admin.ModelAdmin):
     ordering = ['-published_at']
 
     prepopulated_fields = {'slug': ('title',)}
-    raw_id_fields = ('author',)
+    raw_id_fields = ('author', 'created_by', 'updated_by', 'deleted_by')
     date_hierarchy = 'published_at'
     readonly_fields = ('created_at', 'updated_at')
+    actions = ['published_posts', 'restore_posts']
 
     fieldsets = (
         ('Main Content', {
@@ -45,6 +48,26 @@ class PostAdmin(admin.ModelAdmin):
         })
     )
 
+    def get_queryset(self, request):
+        return Post.all_objects.all()
+
+    def preview_image(self, obj):
+        if obj.featured_image:
+            return format_html(
+                '<img src={} style="width:50px;height=50px;">',
+                obj.featured_image.url
+            )
+        return '--'
+    preview_image.short_description = 'Image'
+
+    def published_posts(self, request, queryset):
+        queryset.update(status=Post.Status.PUBLISHED)
+    published_posts.short_description = 'Published selected Posts'
+
+    def restore_posts(self, request, queryset):
+        queryset.update(is_deleted=False, deleted_at=None, deleted_by=None)
+    restore_posts.short_description = 'Restore selected Posts'
+
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.author = request.user
@@ -55,6 +78,10 @@ class PostAdmin(admin.ModelAdmin):
     
     def delete_model(self, request, obj):
         obj.delete(user=request.user)
+    
+    def delete_queryset(self, request: HttpRequest, queryset: QuerySet) -> None:
+        for obj in queryset:
+            obj.delete(user=request.user)
     
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
