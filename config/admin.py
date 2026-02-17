@@ -36,6 +36,11 @@ class AuditAdminMixin:
         audit_filters = ('is_deleted', 'created_at', 'updated_at', 'deleted_at')
         return base_filters + audit_filters
 
+    def get_readonly_fields(self, request, obj):
+        base = super().get_readonly_fields(request, obj)
+        audit = ('created_at', 'updated_at')
+        return base + audit
+    
     def get_queryset(self, request):
         return self.model.all_objects.all()
     
