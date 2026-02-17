@@ -6,16 +6,16 @@ app_name = 'blog'
 
 urlpatterns = [
     # Home and list views
-    path('', views.PostListView.as_view(), name='home'),
-    path('blog/', views.PostListView.as_view(), name='post_list'),
+    path('', views.ArticleListView.as_view(), name='home'),
+    path('blog/', views.ArticleListView.as_view(), name='article_list'),
     path('blog/category/<slug:category_slug>/', 
-         views.PostListView.as_view(), name='category'),
+         views.ArticleListView.as_view(), name='category'),
     path('blog/tag/<slug:tag_slug>/', 
-         views.PostListView.as_view(), name='tag'),
+         views.ArticleListView.as_view(), name='tag'),
     
     # Detail views
     path('blog/<slug:slug>/', 
-         views.PostDetailView.as_view(), name='post_detail'),
+         views.ArticleDetailView.as_view(), name='article_detail'),
     path('blog/<slug:slug>/comment/', 
          views.CommentCreateView.as_view(), name='add_comment'),
     
