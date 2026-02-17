@@ -5,12 +5,15 @@ from django.http import HttpRequest
 from .models import Category, Tag, Comment, Post
 from django.utils.html import format_html
 from config.admin import AuditAdminMixin
+from django.urls import path, reverse
+from django.shortcuts import redirect
+from django.contrib import messages
 
 @admin.register(Post)
 class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
     model = Post
 
-    list_display = ('id', 'preview_image', 'title', 'status')
+    list_display = ('id', 'preview_image', 'title', 'status', 'restore_button',)
     list_display_links = ('id', 'title')
     list_filter = ('published_at', 'status')
     list_per_page = 10
@@ -61,7 +64,7 @@ class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
         qs = queryset.exclude(status=Post.Status.PUBLISHED)
         count = qs.update(status=Post.Status.PUBLISHED)
         self.message_user(request, f'{count} posts status updated successfully.')
-
+    
 @admin.register(Category)
 class CategoryAdmin(AuditAdminMixin, admin.ModelAdmin):
     model = Category
