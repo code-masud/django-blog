@@ -9,6 +9,15 @@ from django.contrib import messages
 
 class AuditAdminMixin:
     
+    @admin.action(description='Hard delete selected items')
+    def hard_delete(self, request, queryset):
+        count = 0
+        for obj in queryset:
+            count += 1
+            obj.hard_delete()
+        
+        self.message_user(request, f'{count} items hard deleted successfully.')
+
     @admin.action(description="Restore selected items")
     def restore_selected(self, request, queryset):
         restored_count = 0
@@ -39,6 +48,11 @@ class AuditAdminMixin:
             self.__class__.restore_selected,
             "restore_selected",
             "Restore selected items",
+        )
+        actions["hard_delete"] = (
+            self.__class__.hard_delete,
+            "hard_delete",
+            "Hard delete selected items",
         )
         return actions
     
