@@ -21,7 +21,6 @@ class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     raw_id_fields = ('author', 'created_by', 'updated_by', 'deleted_by')
     date_hierarchy = 'published_at'
-    readonly_fields = ('created_at', 'updated_at')
     actions = ('published_posts', )
 
     fieldsets = (
@@ -80,6 +79,10 @@ class CategoryAdmin(AuditAdminMixin, admin.ModelAdmin):
         ('Main Content', {
             'fields': ('name', 'slug', 'description', 'is_active')
         }),
+        ('Soft Delete',{
+            'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
+            'classes': ('collapse',)
+        })
     )
 
 @admin.register(Tag)
@@ -99,6 +102,10 @@ class TagAdmin(AuditAdminMixin, admin.ModelAdmin):
         ('Main Content', {
             'fields': ('name', 'slug', 'description', 'is_active')
         }),
+        ('Soft Delete',{
+            'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
+            'classes': ('collapse',)
+        })
     )
 
 @admin.register(Comment)
@@ -117,6 +124,10 @@ class CommentAdmin(AuditAdminMixin, admin.ModelAdmin):
         ('Main Content', {
             'fields': ('post', 'user', 'text', 'is_approved')
         }),
+        ('Soft Delete',{
+            'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
+            'classes': ('collapse',)
+        })
     )
 
     @admin.display(description='Comment')
