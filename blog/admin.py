@@ -1,5 +1,7 @@
 
+from typing import Any
 from django.contrib import admin
+from django.http import HttpRequest
 from .models import Category, Tag, Comment, Post
 from django.utils.html import format_html
 from config.admin import AuditAdminMixin
@@ -60,7 +62,6 @@ class PostAdmin(AuditAdminMixin, admin.ModelAdmin):
         qs = queryset.exclude(status=Post.Status.PUBLISHED)
         count = qs.update(status=Post.Status.PUBLISHED)
         self.message_user(request, f'{count} posts status updated successfully.')
-
 
 @admin.register(Category)
 class CategoryAdmin(AuditAdminMixin, admin.ModelAdmin):
