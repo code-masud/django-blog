@@ -1,11 +1,11 @@
 from django.core.exceptions import ValidationError
 from django import forms
-from .models import Category, Tag, Post, Comment
+from .models import Category, Tag, Article, Comment
 
-class PostForm(forms.ModelForm):
+class ArticleForm(forms.ModelForm):
     class Meta:
-        model = Post
-        fields = ['title', 'slug', 'excerpt', 'content', 'featured_image', 'status', 'categories', 'tags', 'meta_title', 'meta_description']
+        model = Article
+        fields = ['title', 'slug', 'content', 'featured_image', 'status', 'categories', 'tags']
         widgets = {
             'categories': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'tags': forms.SelectMultiple(attrs={'class': 'form-control'}),
@@ -46,8 +46,8 @@ class TagForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['post', 'user', 'text', 'is_approved']
+        fields = ['article', 'user', 'text', 'is_approved']
         widgets = {
-            'post': forms.Select(attrs={'class': 'form-control'}),
+            'article': forms.Select(attrs={'class': 'form-control'}),
             'user': forms.Select(attrs={'class': 'form-control'}),
         }
