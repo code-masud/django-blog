@@ -1,80 +1,98 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Blog{% endblock %}</title>
-    {% load static %}
-    {% load bootstrap5 %}
-    
-    <!-- Bootstrap 5 -->
-    {% bootstrap_css %}    
-    <!-- Custom CSS -->
-    {% comment %} <link rel="stylesheet" href="{% static 'blog/css/style.css' %}"> {% endcomment %}
-    
-    {% block extra_head %}{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Blog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'blog:home' %}">
-                Blog
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-                    data-bs-target="#navbarMain">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'blog:home' %}">Home</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" 
-                           data-bs-toggle="dropdown">Categories</a>
-                        <ul class="dropdown-menu">
-                            {% for category in categories %}
-                            <li>
-                                <a class="dropdown-item" 
-                                   href="{% url 'blog:category' category.slug %}">
-                                    {{ category.name }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Authors</a>
-                    </li>
-                </ul>
-                
-                <!-- Search form -->
-                <form class="d-flex ms-3" method="get" action="{% url 'blog:post_list' %}">
-                    <input class="form-control me-2" type="search" name="q" 
-                           placeholder="Search articles..." aria-label="Search">
-                    <button class="btn btn-outline-light" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">MyBlog</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      <!-- Categories -->
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="#">Technology</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Travel</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Lifestyle</a></li>
+      </ul>
+
+      <!-- Search -->
+      <form class="d-flex me-3" action="search.html">
+        <input class="form-control me-2" type="search" placeholder="Search">
+        <button class="btn btn-outline-light">Search</button>
+      </form>
+
+      <!-- Auth -->
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+<div class="container my-5">
+  <!-- Page Content Here -->
+  <div class="row">
+
+  <!-- Post List -->
+  <div class="col-md-8">
+
+    <!-- Post Card -->
+    <div class="card mb-4">
+      <img src="https://via.placeholder.com/800x400" class="card-img-top">
+      <div class="card-body">
+        <h3 class="card-title">Post Title</h3>
+        <p class="text-muted">By John Doe | Jan 1, 2026</p>
+        <p class="card-text">Short description of the post content...</p>
+        <a href="post-detail.html" class="btn btn-primary">Read More</a>
+      </div>
+    </div>
+
+    <!-- Repeat posts -->
+
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+      </ul>
     </nav>
-    
-    <!-- Main content -->
-    <main class="container my-4">
-        {% block content %}
-        {% endblock %}
-    </main>
-    
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2024 Blog. All rights reserved.</p>
-        </div>
-    </footer>
-    
-    <!-- Bootstrap JS -->
-    {% bootstrap_javascript %}   
+
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-header">Categories</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><a href="#">Technology</a></li>
+        <li class="list-group-item"><a href="#">Travel</a></li>
+        <li class="list-group-item"><a href="#">Lifestyle</a></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="bg-dark text-white text-center p-3 mt-5">
+  © 2026 MyBlog
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
