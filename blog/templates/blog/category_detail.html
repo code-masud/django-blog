@@ -1,74 +1,118 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 
-{% block title %} {{ title }} {% endblock  %}
+    {% block seo_tag %}
+        <meta name="description" content="{{ category.meta_description|default_if_none:category.name}}">
+        <link rel="canonical" href="{{ request.build_absolute_uri }}">
+        <meta name="robots" content="index, follow">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ category.og_title|default_if_none:category.name}}">
+        <meta property="og:description" content="{{ category.og_description|default_if_none:category.name }}">
+        <meta property="og:url" content="{{ request.build_absolute_uri }}">
+        <meta property="og:site_name" content="{{ company_data.name|default:'MyBlog'}}">
+        {% if category.og_image %}
+        <meta property="og:image" content="{{ category.og_image.url }}">
+        {% endif %}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ category.twitter_title|default_if_none:category.name}}">
+        <meta name="twitter:description" content="{{ category.twitter_description|default_if_none:category.name}}">
+        {% if category.twitter_image %}
+        <meta name="twitter:image" content="{{ category.twitter_image.url }}">
+        {% endif %}
+    {% endblock  %}
 
-{% block content %}
-    <div class="mb-4 text-center">
-        <h3 class="fw-bold">
-            {{ category.name }}
-        </h3>
-    </div>
-    <!-- Blog Card -->
-    {% load humanize %}
-    {% for article in article_list %}
-        <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
-            <!-- Clickable Overlay Link (Makes Entire Card Clickable) -->
-            <a href="{% url 'blog:article_detail' article.slug %}" 
-            class="stretched-link"></a>
+    {% block structured_data %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "{{ category.name }} Articles",
+        "url": "{{ request.build_absolute_uri }}",
+        "description": "{{ category.description|default:''|escapejs }}",
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+            {% for article in article_list %}
+            {
+                "@type": "ListItem",
+                "position": {{ forloop.counter }},
+                "url": "{{ request.scheme }}://{{ request.get_host }}{{ article.get_absolute_url }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+            ]
+        }
+    }
+    </script>
+    {% endblock %}
 
-            <!-- Background Image -->
-            {% if article.featured_image %}
-            <div class="card-img-top"
-                style="
-                    height: 100px;
-                    background: url('{{ article.featured_image.url }}') center/cover no-repeat;
-                ">
-            </div>
-            {% endif %}
+    {% block title %} {{ title }} {% endblock  %}
 
-            <div class="card-body">
-                <h3 class="card-title">
-                    {{ article.title|truncatechars:45 }}
-                </h3>
-                <p class="text-muted small">
-                    {% for category in article.categories.all %}
-                        <span class="badge bg-primary mb-2">
-                            {{ category.name }}
-                        </span>
-                    {% endfor %}
-                    &nbsp;&nbsp;
-                    {{ article.published_at|naturaltime }}
-                </p>
-            </div>
-        </div>
-    {% empty %}
-    <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
-        <div class="card-body">
-            <h3 class="card-title text-center">
-                NO RESULT FOUND
+    {% block content %}
+        <div class="mb-4 text-center">
+            <h3 class="fw-bold">
+                {{ category.name }}
             </h3>
         </div>
-    </div>
-    {% endfor %}
+        <!-- Blog Card -->
+        {% load humanize %}
+        {% for article in article_list %}
+            <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
+                <!-- Clickable Overlay Link (Makes Entire Card Clickable) -->
+                <a href="{% url 'blog:article_detail' article.slug %}" 
+                class="stretched-link"></a>
 
-    <!-- Pagination -->
-    {% if is_paginated %}
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
+                <!-- Background Image -->
+                {% if article.featured_image %}
+                <div class="card-img-top"
+                    style="
+                        height: 100px;
+                        background: url('{{ article.featured_image.url }}') center/cover no-repeat;
+                    ">
+                </div>
                 {% endif %}
-                {% for num in paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                        <li class="page-item"><a href="?page={{num}}" class="page-link">{{num}}</a></li>
+
+                <div class="card-body">
+                    <h3 class="card-title">
+                        {{ article.title|truncatechars:45 }}
+                    </h3>
+                    <p class="text-muted small">
+                        {% for category in article.categories.all %}
+                            <span class="badge bg-primary mb-2">
+                                {{ category.name }}
+                            </span>
+                        {% endfor %}
+                        &nbsp;&nbsp;
+                        {{ article.published_at|naturaltime }}
+                    </p>
+                </div>
+            </div>
+        {% empty %}
+        <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
+            <div class="card-body">
+                <h3 class="card-title text-center">
+                    NO RESULT FOUND
+                </h3>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
                     {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    {% endif %}
-{% endblock %}
+                    {% for num in paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a href="?page={{num}}" class="page-link">{{num}}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% endblock %}

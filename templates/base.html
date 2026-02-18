@@ -2,150 +2,153 @@
 {% load bootstrap5 %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ company_data.name|default:'MyBlog' }} | {% block title %}{% endblock  %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ company_data.name|default:'MyBlog' }} | {% block title %}{% endblock  %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {% block seo_tag %}
-    <meta name="description" content="{{ company_data.description|default:'Blog Site'}}">
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
-    <meta name="robots" content="index, follow">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ company_data.name|default:'MyBlog'}}">
-    <meta property="og:description" content="{{ company_data.description|default:'Blog Site'}}">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:site_name" content="{{ company_data.name|default:'MyBlog'}}">
-    {% if company_data.logo %}
-    <meta property="og:image" content="{{ company_data.logo.url }}">
-    {% endif %}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ company_data.name|default:'MyBlog'}}">
-    <meta name="twitter:description" content="{{ company_data.description|default:'MyBlog'}}">
-    {% if company_data.logo %}
-    <meta name="twitter:image" content="{{ company_data.logo.url }}">
-    {% endif %}
-    {% if company_data.logo %}
-    <link rel="icon" href="{{ company_data.logo.url }}" type="image/x-icon">
-    {% endif %}
-    {% endblock  %}
-
-    {% block structured_data %}
-    {% endblock  %}
-
-    {% bootstrap_css %}
-</head>
-<body>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="{% url 'blog:home' %}">
-    {% if company_data.logo %}
-      <img src="{{ company_data.logo.url }}" 
-           alt="MyBlog Logo"
-           height="25"
-           class="me-2">
-    {% endif %}
-      <span class="fw-bold">{{ company_data.name|default:'MyBlog' }}</span>
-    </a>
-
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-
-      <!-- Categories -->
-      <ul class="navbar-nav me-auto">
-        {% for category in navbar_categories %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'blog:category' category.slug %}">{{ category.name }}</a></li>
-        {% endfor %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:contact' %}">Contact</a></li>
-      </ul>
-
-      <!-- Auth -->
-      <ul class="navbar-nav">
-        {% if request.user.is_authenticated %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:account_profile' %}">Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
-        {% else %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+        {% block seo_tag %}
+        <meta name="description" content="{{ company_data.description|default:'Blog Site'}}">
+        <link rel="canonical" href="{{ request.build_absolute_uri }}">
+        <meta name="robots" content="index, follow">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ company_data.name|default:'MyBlog'}}">
+        <meta property="og:description" content="{{ company_data.description|default:'Blog Site'}}">
+        <meta property="og:url" content="{{ request.build_absolute_uri }}">
+        <meta property="og:site_name" content="{{ company_data.name|default:'MyBlog'}}">
+        {% if company_data.logo %}
+        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_data.logo.url }}">
         {% endif %}
-      </ul>
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ company_data.name|default:'MyBlog'}}">
+        <meta name="twitter:description" content="{{ company_data.description|default:'MyBlog'}}">
+        {% if company_data.logo %}
+        <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ company_data.logo.url }}">
+        {% endif %}
+        {% endblock  %}
 
-    </div>
-  </div>
-</nav>
+        {% if company_data.logo %}
+        <link rel="icon" href="{{ request.scheme }}://{{ request.get_host }}{{ company_data.logo.url }}" type="image/x-icon">
+        {% endif %}
 
-<!-- MAIN CONTENT -->
-<div class="container my-2">
-    <div class="row">
-
-        <!-- BLOG POSTS -->
-        <div class="col-lg-8">
-          {% block content %}{% endblock  %}
-        </div>
-
-        <!-- SIDEBAR -->
-        <div class="col-lg-4">
-
-            <!-- Search -->
-            <div class="card sidebar-card mb-4 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Search</h5>
-                    <form action="{% url 'blog:search' %}" method="GET">
-                        <div class="input-group">
-                            <input type="text" name='q' class="form-control" value="{{ query|default:'' }}" placeholder="Search blog..." required>
-                            <button type="submit" class="btn btn-primary">Go</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Archives -->
-            <div class="card sidebar-card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Archives</h5>
-                    <ul class="list-unstyled">
-
-                        {% for item in archive_menu %}
-                        <li>
-                            <a href="{% url 'blog:archive' item.month|date:'Y' item.month|date:'m' %}"
-                            class="archive-link d-flex justify-content-between">
-
-                                <span>
-                                    {{ item.month|date:"F Y" }}
-                                </span>
-
-                                <span class="badge bg-light text-dark">
-                                    {{ item.total }}
-                                </span>
-
-                            </a>
-                        </li>
-                        {% empty %}
-                        <li>No archives available</li>
+        {% block structured_data %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": "{{ request.scheme }}://{{ request.get_host }}/#website",
+            "url": "{{ request.scheme }}://{{ request.get_host }}",
+            "name": "{{ company_data.name }}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ request.scheme }}://{{ request.get_host }}{{ company_data.logo.url }}"
+            }
+            "publisher": {
+                "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization"
+            },
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "{{ request.scheme }}://{{ request.get_host }}/search/?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+            }
+        }
+        </script>
+        {% endblock  %}
+        {% bootstrap_css %}
+    </head>
+    <body>
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'blog:home' %}">
+                    {% if company_data.logo %}
+                    <img src="{{ company_data.logo.url }}" 
+                        alt="MyBlog Logo"
+                        height="25"
+                        class="me-2">
+                    {% endif %}
+                    <span class="fw-bold">{{ company_data.name|default:'MyBlog' }}</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Categories -->
+                    <ul class="navbar-nav me-auto">
+                        {% for category in navbar_categories %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'blog:category' category.slug %}">{{ category.name }}</a></li>
                         {% endfor %}
-
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:contact' %}">Contact</a></li>
+                    </ul>
+                    <!-- Auth -->
+                    <ul class="navbar-nav">
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:account_profile' %}">Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
+        </nav>
+        <!-- MAIN CONTENT -->
+        <div class="container my-2">
+            <div class="row">
+                <!-- BLOG POSTS -->
+                <div class="col-lg-8">
+                    {% block content %}{% endblock  %}
+                </div>
+                <!-- SIDEBAR -->
+                <div class="col-lg-4">
+                    <!-- Search -->
+                    <div class="card sidebar-card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Search</h5>
+                            <form action="{% url 'blog:search' %}" method="GET">
+                                <div class="input-group">
+                                    <input type="text" name='q' class="form-control" value="{{ query|default:'' }}" placeholder="Search blog..." required>
+                                    <button type="submit" class="btn btn-primary">Go</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Archives -->
+                    <div class="card sidebar-card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Archives</h5>
+                            <ul class="list-unstyled">
+                                {% for item in archive_menu %}
+                                <li>
+                                    <a href="{% url 'blog:archive' item.month|date:'Y' item.month|date:'m' %}"
+                                    class="archive-link d-flex justify-content-between">
 
+                                        <span>
+                                            {{ item.month|date:"F Y" }}
+                                        </span>
 
+                                        <span class="badge bg-light text-dark">
+                                            {{ item.total }}
+                                        </span>
+
+                                    </a>
+                                </li>
+                                {% empty %}
+                                <li>No archives available</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-    </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="text-center">
-    <div class="container">
-        <p class="mb-0"> {{ company_data.footer_text|default:"© 2026 My Blog. All rights reserved." }}</p>
-    </div>
-</footer>
-
-{% bootstrap_javascript %}
-</body>
+        <!-- FOOTER -->
+        <footer class="text-center">
+            <div class="container">
+                <p class="mb-0"> {{ company_data.footer_text|default:"© 2026 My Blog. All rights reserved." }}</p>
+            </div>
+        </footer>
+    {% bootstrap_javascript %}
+    </body>
 </html>
