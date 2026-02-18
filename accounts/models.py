@@ -12,6 +12,7 @@ class Company(models.Model):
     phone = PhoneNumberField(blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    footer_text = models.TextField(help_text='Footer text', blank=True, null=True)
 
     def __str__(self):
         return self.name
