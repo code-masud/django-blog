@@ -4,10 +4,11 @@ from django.db.models import Q
 from .models import Article, Category, Tag, Comment
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
-from .forms import CommentForm
+from .forms import CommentForm, ArticleForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 
 class ArticleListView(generic.ListView):
     model = Article
@@ -34,7 +35,62 @@ class ArticleDetailView(generic.DetailView):
         context['comments'] = self.object.comments.filter(is_approved=True)
         context['form'] = CommentForm()
         return context
+    
+class ArticleEditView(generic.UpdateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'blog/article_form.html'
+    success_url = reverse_lazy('blog:home')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = f'Edit: {self.object.title}'
+        return context
+    
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        messages.success(self.request, f'Article "{self.object.title}" updated successfully.')
+        return super().form_valid(form)
+
+class ArticleDeleteView(generic.DeleteView):
+    model = Article
+    success_url = reverse_lazy('blog:home')
+    template_name = 'blog/article_confirm_delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = f'Delete: {self.object.title}'
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_deleted = True
+        self.object.deleted_by = request.user
+        self.object.deleted_at = timezone.now()
+        self.object.save()
+        messages.success(request, f'Article deleted successfully.')
+        return reverse_lazy(self.success_url)
+
+class ArticleAddView(generic.CreateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'blog/article_form.html'
+    success_url = reverse_lazy('blog:home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = 'Add Article'
+        return context
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.author = self.request.user
+        if form.instance.status == Article.Status.PUBLISHED:
+            form.instance.published_at = timezone.now()
+        messages.success(self.request, 'Article created successfully.')
+        return super().form_valid(form)
+    
+    
 class CategoryDetailView(generic.DetailView):
     model = Category
     template_name = 'blog/category_detail.html'

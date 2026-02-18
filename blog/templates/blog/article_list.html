@@ -40,13 +40,13 @@
                     {% if request.user.is_authenticated %}
                     <div class="d-flex gap-2">
                         {% if request.user|has_any_group:"Admin,Manger,Editor" or request.user == article.author or perms.blog.change_article %}
-                        <a href="/"
+                        <a href="{% url 'blog:article_edit' article.slug %}"
                         class="btn btn-sm btn-outline-primary">
                             Edit
                         </a>
                         {% endif %}
                         {% if request.user|has_any_group:"Admin,Manger,Editor" or request.user == article.author or perms.blog.delete_article %}
-                        <a href="/"
+                        <a href="{% url 'blog:article_delete' article.slug %}"
                         class="btn btn-sm btn-outline-danger">
                             Delete
                         </a>

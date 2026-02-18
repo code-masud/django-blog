@@ -14,7 +14,7 @@ def archive_menu(request):
     months = (
         Article.objects
         .filter(status=Article.Status.ARCHIVE)
-        .annotate(month=TruncMonth("published_at"))
+        .annotate(month=TruncMonth("created_at"))
         .values("month")
         .annotate(total=Count("id"))
         .order_by("-month")

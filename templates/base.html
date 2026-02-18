@@ -112,6 +112,13 @@
                 </div>
                 <!-- SIDEBAR -->
                 <div class="col-lg-4">
+                    {% load auth_extras %}
+                    {% if request.user.is_authenticated %}
+                        {% if request.user|has_any_group:"Admin,Manger,Editor" or perms.blog.add_article %}
+                            <a href="{% url 'blog:article_add' %}" class="btn btn-primary">Add Article</a>
+                            <br><br>
+                        {% endif %}
+                    {% endif %}
                     <!-- Search -->
                     <div class="card sidebar-card mb-4 shadow-sm">
                         <div class="card-body">

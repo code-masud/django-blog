@@ -5,7 +5,7 @@ from .models import Category, Tag, Article, Comment
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ['title', 'slug', 'content', 'featured_image', 'status', 'categories', 'tags']
+        fields = ['title', 'slug', 'content', 'featured_image', 'status', 'categories', 'tags', 'meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'og_title', 'og_description', 'og_image','twitter_title', 'twitter_description', 'twitter_image']
         widgets = {
             'categories': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'tags': forms.SelectMultiple(attrs={'class': 'form-control'}),
