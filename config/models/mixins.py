@@ -35,8 +35,8 @@ class AuditSoftDeleteMixin(models.Model):
     is_deleted = models.BooleanField(default=False, db_index=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
-    objects = AuditSoftDeleteManager()
-    all_objects = models.Manager()
+    objects = models.Manager()
+    alive_objects = AuditSoftDeleteManager()
 
     class Meta:
         abstract = True
