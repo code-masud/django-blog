@@ -7,8 +7,9 @@ from django.urls import reverse_lazy
 from .forms import CommentForm, ArticleForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils import timezone
+from django.contrib.messages.views import SuccessMessageMixin
 
 class ArticleListView(generic.ListView):
     model = Article
@@ -39,11 +40,12 @@ class ArticleDetailView(generic.DetailView):
         context['form'] = CommentForm()
         return context
     
-class ArticleEditView(generic.UpdateView):
+class ArticleEditView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Article
     form_class = ArticleForm
     template_name = 'blog/article_form.html'
     success_url = reverse_lazy('blog:home')
+    permission_required = ['blog.change_article']
 
     def get_queryset(self):
         return Article.alive_objects.all()
@@ -58,10 +60,12 @@ class ArticleEditView(generic.UpdateView):
         messages.success(self.request, f'Article "{self.object.title}" updated successfully.')
         return super().form_valid(form)
 
-class ArticleDeleteView(generic.DeleteView):
+class ArticleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
     model = Article
     success_url = reverse_lazy('blog:home')
     template_name = 'blog/article_confirm_delete.html'
+    success_message = "Article deleted successfully."
+    permission_required = ['blog.delete_article']
 
     def get_queryset(self):
         return Article.alive_objects.all()
@@ -77,15 +81,15 @@ class ArticleDeleteView(generic.DeleteView):
         self.object.deleted_by = request.user
         self.object.deleted_at = timezone.now()
         self.object.save()
-        messages.success(request, 'Article deleted successfully.')
         return super().delete(request, *args, **kwargs)
 
 
-class ArticleAddView(generic.CreateView):
+class ArticleAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Article
     form_class = ArticleForm
     template_name = 'blog/article_form.html'
     success_url = reverse_lazy('blog:home')
+    permission_required = ['blog.add_article']
 
     def get_queryset(self):
         return Article.alive_objects.all()
