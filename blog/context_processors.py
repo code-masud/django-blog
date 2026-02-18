@@ -12,7 +12,7 @@ from .models import Article
 
 def archive_menu(request):
     months = (
-        Article.objects
+        Article.alive_objects
         .filter(status=Article.Status.ARCHIVE)
         .annotate(month=TruncMonth("created_at"))
         .values("month")
