@@ -6,34 +6,54 @@
         <!-- Blog Card -->
         {% load humanize %}
         {% for article in article_list %}
-            <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
-                <!-- Clickable Overlay Link (Makes Entire Card Clickable) -->
-                <a href="{% url 'blog:article_detail' article.slug %}" 
-                class="stretched-link"></a>
-
-                <!-- Background Image -->
+            <div class="card blog-card mb-4 shadow-sm overflow-hidden">
+                <!-- Clickable Image -->
                 {% if article.featured_image %}
-                <div class="card-img-top"
-                    style="
-                        height: 100px;
-                        background: url('{{ article.featured_image.url }}') center/cover no-repeat;
-                    ">
-                </div>
+                <a href="{% url 'blog:article_detail' article.slug %}">
+                    <div class="card-img-top"
+                        style="height:120px;
+                                background:url('{{ article.featured_image.url }}') center/cover no-repeat;">
+                    </div>
+                </a>
                 {% endif %}
 
                 <div class="card-body">
-                    <h3 class="card-title">
-                        {{ article.title|truncatechars:45 }}
-                    </h3>
-                    <p class="text-muted small">
+                    <!-- Categories -->
+                    <div class="mb-2">
                         {% for category in article.categories.all %}
-                            <span class="badge bg-primary mb-2">
+                            <a href="{% url 'blog:category' category.slug %}"
+                            class="badge bg-primary text-decoration-none me-1">
                                 {{ category.name }}
-                            </span>
+                            </a>
                         {% endfor %}
-                        &nbsp;&nbsp;
                         {{ article.published_at|naturaltime }}
-                    </p>
+                    </div>
+
+                    <!-- Clickable Title -->
+                    <h6 class="card-title mb-2">
+                        <a href="{% url 'blog:article_detail' article.slug %}"
+                        class="text-dark text-decoration-none">
+                            {{ article.title|truncatechars:45 }}
+                        </a>
+                    </h6>
+                    {% load auth_extras %}
+                    {% if request.user.is_authenticated %}
+                    <div class="d-flex gap-2">
+                        {% if request.user|has_any_group:"Admin,Manger,Editor" or request.user == article.author or perms.blog.change_article %}
+                        <a href="/"
+                        class="btn btn-sm btn-outline-primary">
+                            Edit
+                        </a>
+                        {% endif %}
+                        {% if request.user|has_any_group:"Admin,Manger,Editor" or request.user == article.author or perms.blog.delete_article %}
+                        <a href="/"
+                        class="btn btn-sm btn-outline-danger">
+                            Delete
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
                 </div>
             </div>
         {% empty %}
