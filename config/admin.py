@@ -88,9 +88,6 @@ class AuditAdminMixin:
     restore_button.short_description = "Restore"
     restore_button.allow_tags = True
 
-    def get_queryset(self, request):
-        return self.model.all_objects.all()
-
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.created_by = request.user
