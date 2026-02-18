@@ -68,8 +68,9 @@ class ArticleDeleteView(generic.DeleteView):
         self.object.deleted_by = request.user
         self.object.deleted_at = timezone.now()
         self.object.save()
-        messages.success(request, f'Article deleted successfully.')
-        return reverse_lazy(self.success_url)
+        messages.success(request, 'Article deleted successfully.')
+        return super().delete(request, *args, **kwargs)
+
 
 class ArticleAddView(generic.CreateView):
     model = Article
