@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     'bootstrap5',
     'crispy_forms',
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'blog.context_processors.navbar_categories',
+                'blog.context_processors.archive_menu',
                 'accounts.context_processors.company_data',
             ],
         },
@@ -150,6 +152,6 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-LOGIN_URL='accounts/login/'
-LOGOUT_URL='accounts/logout/'
-LOGOUT_REDIRECT_URL='/'
+LOGIN_URL='account_login'
+LOGOUT_URL='account_logout'
+LOGOUT_REDIRECT_URL='blog:home'

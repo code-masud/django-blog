@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %} {{ title }} {% endblock  %}
+
+{% block content %}
+    <div class="mb-4 text-center">
+        <h3 class="fw-bold">
+            Contact With Us
+        </h3>
+    </div>
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
+        <div class="card-body">
+            <form action="{% url 'accounts:contact' %}" method="post">
+                {% csrf_token %}
+                {% load crispy_forms_tags %}
+                {{ form|crispy}}
+                <button class="btn btn-primary" type="submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

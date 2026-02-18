@@ -7,13 +7,32 @@
     <title>{{ company_data.name|default:'MyBlog' }} | {% block title %}{% endblock  %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- SEO -->
-    {% block seo_tag %}{% endblock  %}
+    {% block seo_tag %}
+    <meta name="description" content="{{ company_data.description|default:'Blog Site'}}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ company_data.name|default:'MyBlog'}}">
+    <meta property="og:description" content="{{ company_data.description|default:'Blog Site'}}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="{{ company_data.name|default:'MyBlog'}}">
+    {% if company_data.logo %}
+    <meta property="og:image" content="{{ company_data.logo.url }}">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ company_data.name|default:'MyBlog'}}">
+    <meta name="twitter:description" content="{{ company_data.description|default:'MyBlog'}}">
+    {% if company_data.logo %}
+    <meta name="twitter:image" content="{{ company_data.logo.url }}">
+    {% endif %}
+    {% if company_data.logo %}
+    <link rel="icon" href="{{ company_data.logo.url }}" type="image/x-icon">
+    {% endif %}
+    {% endblock  %}
 
-    <!-- SEO -->
-    {% block structured_data %}{% endblock  %}
+    {% block structured_data %}
+    {% endblock  %}
 
-    <!-- Bootstrap 5 -->
     {% bootstrap_css %}
 </head>
 <body>
@@ -42,6 +61,7 @@
         {% for category in navbar_categories %}
         <li class="nav-item"><a class="nav-link" href="{% url 'blog:category' category.slug %}">{{ category.name }}</a></li>
         {% endfor %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:contact' %}">Contact</a></li>
       </ul>
 
       <!-- Auth -->
@@ -75,10 +95,10 @@
             <div class="card sidebar-card mb-4 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Search</h5>
-                    <form>
+                    <form action="{% url 'blog:search' %}" method="GET">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search blog...">
-                            <button class="btn btn-primary">Go</button>
+                            <input type="text" name='q' class="form-control" value="{{ query|default:'' }}" placeholder="Search blog..." required>
+                            <button type="submit" class="btn btn-primary">Go</button>
                         </div>
                     </form>
                 </div>
@@ -89,13 +109,30 @@
                 <div class="card-body">
                     <h5 class="card-title">Archives</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="archive-link">January 2026</a></li>
-                        <li><a href="#" class="archive-link">December 2025</a></li>
-                        <li><a href="#" class="archive-link">November 2025</a></li>
-                        <li><a href="#" class="archive-link">October 2025</a></li>
+
+                        {% for item in archive_menu %}
+                        <li>
+                            <a href="{% url 'blog:archive' item.month|date:'Y' item.month|date:'m' %}"
+                            class="archive-link d-flex justify-content-between">
+
+                                <span>
+                                    {{ item.month|date:"F Y" }}
+                                </span>
+
+                                <span class="badge bg-light text-dark">
+                                    {{ item.total }}
+                                </span>
+
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li>No archives available</li>
+                        {% endfor %}
+
                     </ul>
                 </div>
             </div>
+
 
         </div>
 

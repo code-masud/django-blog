@@ -137,10 +137,6 @@ class CommentAdmin(AuditAdminMixin, admin.ModelAdmin):
         ('Main Content', {
             'fields': ('article', 'user', 'text', 'is_approved')
         }),
-        ('SEO',{
-            'fields': ('meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'og_title', 'og_description', 'og_image','twitter_title', 'twitter_description', 'twitter_image'),
-            'classes': ('collapse',)
-        }),
         ('Soft Delete',{
             'fields': ('created_at', 'created_by', 'updated_at', 'updated_by', 'is_deleted', 'deleted_at', 'deleted_by'),
             'classes': ('collapse',)

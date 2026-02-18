@@ -3,6 +3,11 @@
 {% block title %} {{ title }} {% endblock  %}
 
 {% block content %}
+    <div class="mb-4 text-center">
+        <h3 class="fw-bold">
+            {{ category.name }}
+        </h3>
+    </div>
     <!-- Blog Card -->
     {% load humanize %}
     {% for article in article_list %}

@@ -46,8 +46,4 @@ class TagForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['article', 'user', 'text', 'is_approved']
-        widgets = {
-            'article': forms.Select(attrs={'class': 'form-control'}),
-            'user': forms.Select(attrs={'class': 'form-control'}),
-        }
+        fields = ['text']
