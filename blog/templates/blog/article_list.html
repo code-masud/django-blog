@@ -33,7 +33,7 @@
                     <h6 class="card-title mb-2">
                         <a href="{% url 'blog:article_detail' article.slug %}"
                         class="text-dark text-decoration-none">
-                            {{ article.title|truncatechars:45 }}
+                            <h4>{{ article.title|truncatechars:45 }}</h4>
                         </a>
                     </h6>
                     {% load auth_extras %}
