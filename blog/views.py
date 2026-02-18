@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class ArticleListView(generic.ListView):
     model = Article
     template_name = 'blog/article_list.html'
-    paginate_by = 2
+    paginate_by = 5
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,7 +40,7 @@ class CategoryDetailView(generic.DetailView):
     template_name = 'blog/category_detail.html'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
-    paginate_by = 2
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,7 +62,7 @@ class TagDetailView(generic.DetailView):
     template_name = 'blog/tag_detail.html'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
-    paginate_by = 2
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,7 +83,7 @@ class SearchView(generic.ListView):
     model = Article
     template_name = 'blog/search_results.html'
     context_object_name = 'article_list'
-    paginate_by = 2
+    paginate_by = 5
 
     def get_queryset(self):
         query = self.request.GET.get('q')
@@ -91,7 +91,6 @@ class SearchView(generic.ListView):
             return Article.objects.filter(
                 Q(title__icontains=query) |
                 Q(slug__icontains=query) |
-                Q(categories__name__icontains=query) |
                 Q(author__username__icontains=query) |
                 Q(content__icontains=query),
                 status=Article.Status.PUBLISHED
@@ -140,7 +139,7 @@ class ArticleMonthArchiveView(generic.MonthArchiveView):
     date_field = 'published_at'
     allow_future = False
     template_name = 'blog/post_archive_month.html'
-    paginate_by = 2
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
