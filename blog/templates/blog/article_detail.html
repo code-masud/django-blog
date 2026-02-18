@@ -107,9 +107,9 @@
             </div>
 
             <!-- Tags -->
-            {% if article.tags.all %}
+            {% if alive_tags %}
             <div class="mt-4">
-                {% for tag in article.tags.all %}
+                {% for tag in alive_tags %}
                 <a href="{% url 'blog:tag' tag.slug %}"
                     class="badge bg-light text-dark border me-1">
                     #{{ tag.name }}
