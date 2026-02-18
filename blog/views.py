@@ -37,6 +37,7 @@ class ArticleDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.title
         context['comments'] = self.object.comments.filter(is_approved=True)
+        context['alive_tags'] = self.object.tags.filter(is_deleted=False)
         context['form'] = CommentForm()
         return context
     
