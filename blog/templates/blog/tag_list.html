@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}My Blog | Tag {% endblock  %}
+
+{% block content %}
+    <h2>Tag: Technology</h2>
+    <!-- Blog Card -->
+    <div class="card blog-card mb-4 shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title">How to Build a Modern Web App</h3>
+            <p class="text-muted small">January 10, 2026 • 5 min read</p>
+            <p class="card-text">
+                Learn how to design and build scalable web applications using modern technologies...
+            </p>
+            <a href="#" class="btn btn-primary btn-sm">Read More</a>
+        </div>
+    </div>
+
+    <div class="card blog-card mb-4 shadow-sm">
+        <div class="card-body">
+            <h3 class="card-title">Understanding REST APIs</h3>
+            <p class="text-muted small">December 22, 2025 • 4 min read</p>
+            <p class="card-text">
+                REST APIs are the backbone of modern web communication...
+            </p>
+            <a href="#" class="btn btn-primary btn-sm">Read More</a>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item disabled">
+                <a class="page-link">Previous</a>
+            </li>
+            <li class="page-item active">
+                <a class="page-link">1</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link">2</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}
