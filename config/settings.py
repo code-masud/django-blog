@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'phonenumber_field',
 
+    'allauth',
+    'allauth.account',
+
     'blog.apps.BlogConfig',
     'accounts.apps.AccountsConfig',
 ]
@@ -48,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -63,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'blog.context_processors.navbar_categories',
             ],
         },
     },
@@ -138,3 +143,12 @@ EMAIL_USE_TLS=os.getenv('EMAIL_USE_TLS', True)
 EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL')
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+LOGIN_URL='accounts/login/'
+LOGOUT_URL='accounts/logout/'
+LOGOUT_REDIRECT_URL='/'

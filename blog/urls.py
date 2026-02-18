@@ -11,7 +11,6 @@ urlpatterns = [
     path('blog/<slug:slug>/', views.ArticleDetailView.as_view(), name='article_detail'),
     path('blog/category/<slug:category_slug>/', views.CategoryListView.as_view(), name='category'),
     path('blog/tag/<slug:tag_slug>/', views.TagListView.as_view(), name='tag'),
-    path('author/<int:pk>/', views.AuthorDetailView.as_view(), name='author_detail'),
     
     # Detail views
 #     path('blog/<slug:slug>/comment/', views.CommentCreateView.as_view(), name='add_comment'),

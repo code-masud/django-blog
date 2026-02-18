@@ -28,15 +28,6 @@ class ArticleDetailView(generic.DetailView):
         context['titile'] = 'f{self.object.title} | Detail' 
         return context
 
-class AuthorDetailView(generic.DetailView):
-    model = Article
-    template_name = 'blog/author_detail.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titile'] = 'f{self.object.title} | Author' 
-        return context
-
 class CategoryListView(generic.ListView):
     model = Category
     template_name = 'blog/category_list.html'

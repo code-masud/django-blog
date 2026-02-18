@@ -31,15 +31,20 @@
 
       <!-- Categories -->
       <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="#">Technology</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Travel</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Lifestyle</a></li>
+        {% for category in navbar_categories %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'blog:category' category.slug %}">{{ category.name }}</a></li>
+        {% endfor %}
       </ul>
 
       <!-- Auth -->
       <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+        {% if request.user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:account_profile' %}">Profile</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
+        {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+        {% endif %}
       </ul>
 
     </div>
