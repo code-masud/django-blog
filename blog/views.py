@@ -116,7 +116,7 @@ class CategoryDetailView(generic.DetailView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Article.alive_objects.all()
+        return Category.alive_objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -141,7 +141,7 @@ class TagDetailView(generic.DetailView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Article.alive_objects.all()
+        return Tag.alive_objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
