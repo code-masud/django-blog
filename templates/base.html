@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}My Blog{% endblock  %}</title>
+    <title>{{ company_data.name|default:'MyBlog' }} | {% block title %}{% endblock  %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- SEO -->
@@ -21,7 +21,15 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'blog:home' %}">MyBlog</a>
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'blog:home' %}">
+    {% if company_data.logo %}
+      <img src="{{ company_data.logo.url }}" 
+           alt="MyBlog Logo"
+           height="25"
+           class="me-2">
+    {% endif %}
+      <span class="fw-bold">{{ company_data.name|default:'MyBlog' }}</span>
+    </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
@@ -97,7 +105,7 @@
 <!-- FOOTER -->
 <footer class="text-center">
     <div class="container">
-        <p class="mb-0">© 2026 My Blog. All rights reserved.</p>
+        <p class="mb-0"> {{ company_data.footer_text|default:"© 2026 My Blog. All rights reserved." }}</p>
     </div>
 </footer>
 
