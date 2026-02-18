@@ -10,7 +10,10 @@
         </div>
         <div class="card blog-card mb-4 shadow-sm position-relative overflow-hidden">
             <div class="card-body">
-                <form action="{% if article %} {% url 'blog:article_edit' article.slug %} {% else %} {% url 'blog:article_add' %} {% endif %}" method="post">
+                <form action="{% if article %} {% url 'blog:article_edit' article.slug %} {% else %} {% url 'blog:article_add' %} {% endif %}" 
+                    method="post"
+                    enctype='multipart/form-data'
+                >
                     {% csrf_token %}
                     {% load crispy_forms_tags %}
                     {{ form|crispy }}
