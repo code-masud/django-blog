@@ -14,6 +14,9 @@ class ArticleListView(generic.ListView):
     model = Article
     template_name = 'blog/article_list.html'
     paginate_by = 5
+
+    def get_queryset(self):
+        return Article.alive_objects.all()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -27,7 +30,7 @@ class ArticleDetailView(generic.DetailView):
     slug_url_kwarg = 'slug'
 
     def get_queryset(self):
-        return Article.objects.filter(status=Article.Status.PUBLISHED, published_at__isnull=False)
+        return Article.alive_objects.filter(status=Article.Status.PUBLISHED, published_at__isnull=False)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -41,6 +44,9 @@ class ArticleEditView(generic.UpdateView):
     form_class = ArticleForm
     template_name = 'blog/article_form.html'
     success_url = reverse_lazy('blog:home')
+
+    def get_queryset(self):
+        return Article.alive_objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -57,6 +63,9 @@ class ArticleDeleteView(generic.DeleteView):
     success_url = reverse_lazy('blog:home')
     template_name = 'blog/article_confirm_delete.html'
 
+    def get_queryset(self):
+        return Article.alive_objects.all()
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = f'Delete: {self.object.title}'
@@ -77,6 +86,9 @@ class ArticleAddView(generic.CreateView):
     form_class = ArticleForm
     template_name = 'blog/article_form.html'
     success_url = reverse_lazy('blog:home')
+
+    def get_queryset(self):
+        return Article.alive_objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,6 +111,9 @@ class CategoryDetailView(generic.DetailView):
     slug_url_kwarg = 'slug'
     paginate_by = 5
 
+    def get_queryset(self):
+        return Article.alive_objects.all()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.name
@@ -120,6 +135,9 @@ class TagDetailView(generic.DetailView):
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     paginate_by = 5
+
+    def get_queryset(self):
+        return Article.alive_objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -145,14 +163,14 @@ class SearchView(generic.ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:
-            return Article.objects.filter(
+            return Article.alive_objects.filter(
                 Q(title__icontains=query) |
                 Q(slug__icontains=query) |
                 Q(author__username__icontains=query) |
                 Q(content__icontains=query),
                 status=Article.Status.PUBLISHED
             )
-        return Article.objects.none()
+        return Article.alive_objects.none()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -192,7 +210,7 @@ class CommentCreateView(LoginRequiredMixin, generic.CreateView):
         return context 
 
 class ArticleMonthArchiveView(generic.MonthArchiveView):
-    queryset = Article.objects.filter(status=Article.Status.ARCHIVE)
+    queryset = Article.alive_objects.filter(status=Article.Status.ARCHIVE)
     date_field = 'published_at'
     allow_future = False
     template_name = 'blog/post_archive_month.html'
