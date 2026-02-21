@@ -37,14 +37,12 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'phonenumber_field',
 
-    # "allauth_ui",
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
-    # "widget_tweaks",
-    # "slippers",
+    'allauth.mfa',
     
     'blog.apps.BlogConfig',
     'accounts.apps.AccountsConfig',
