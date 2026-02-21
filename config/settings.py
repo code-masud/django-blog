@@ -37,9 +37,15 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'phonenumber_field',
 
+    # "allauth_ui",
     'allauth',
     'allauth.account',
-
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    # "widget_tweaks",
+    # "slippers",
+    
     'blog.apps.BlogConfig',
     'accounts.apps.AccountsConfig',
 ]
@@ -155,3 +161,28 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL='account_login'
 LOGOUT_URL='account_logout'
 LOGOUT_REDIRECT_URL='blog:home'
+
+SITE_ID = 1
+
+ALLAUTH_UI_THEME = "dracula"
+
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# ACCOUNT_SIGNUP_FIELDS = ['username', 'email*', 'password1', 'password2']
+# ACCOUNT_LOGIN_METHODS = {'email'}
+# ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED  = True
+
+# ACCOUNT_SIGNUP_FORM_CLASS = 'accounts.forms.CustomSignupForm'
+ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomSignupForm'}
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        'EMAIL_AUTHENTICATION': True,
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+    }
+}
+
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True

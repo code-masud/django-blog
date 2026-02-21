@@ -1,0 +1,48 @@
+                <!-- SIDEBAR -->
+                <div class="col-lg-4">
+                    {% load auth_extras %}
+                    {% if request.user.is_authenticated %}
+                        {% if request.user|has_any_group:"Admin,Manger,Editor" or perms.blog.add_article %}
+                            <a href="{% url 'blog:article_add' %}" class="btn btn-primary">Add Article</a>
+                            <br><br>
+                        {% endif %}
+                    {% endif %}
+                    <!-- Search -->
+                    <div class="card sidebar-card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Search</h5>
+                            <form action="{% url 'blog:search' %}" method="GET">
+                                <div class="input-group">
+                                    <input type="text" name='q' class="form-control" value="{{ query|default:'' }}" placeholder="Search blog..." required>
+                                    <button type="submit" class="btn btn-primary">Go</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Archives -->
+                    <div class="card sidebar-card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Archives</h5>
+                            <ul class="list-unstyled">
+                                {% for item in archive_menu %}
+                                <li>
+                                    <a href="{% url 'blog:archive' item.month|date:'Y' item.month|date:'m' %}"
+                                    class="archive-link d-flex justify-content-between">
+
+                                        <span>
+                                            {{ item.month|date:"F Y" }}
+                                        </span>
+
+                                        <span class="badge bg-light text-dark">
+                                            {{ item.total }}
+                                        </span>
+
+                                    </a>
+                                </li>
+                                {% empty %}
+                                <li>No archives available</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>

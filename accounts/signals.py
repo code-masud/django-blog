@@ -5,6 +5,31 @@ from django.core.files.storage import default_storage
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from .models import Company, Profile
+from allauth.socialaccount.signals import social_account_added
+from django.core.files.base import ContentFile
+
+@receiver(social_account_added)
+def on_social_account_added(request, sociallogin, **kwargs):
+    print(sociallogin)
+    if sociallogin.account.provider == 'google':
+        user = sociallogin.user
+        picture_url = sociallogin.account.extra_data.get('picture')
+
+        if not picture_url:
+            return
+        
+        profile, created = Profile.objects.get_or_create(user=user)
+
+        if profile.avatar:
+            return
+        
+        response = request.get(picture_url)
+        if response.status_code == 200:
+            profile.avatar.save(
+                f"{user.username}_google.jpg",
+                ContentFile(response.content),
+                save=True
+            )
 
 def delete_file(file=None):
     if not file:
@@ -37,7 +62,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=User)
 def delete_user_profile(sender, instance, **kwargs):
-    profile = Profile.objects.get(user=instance)
+    profile = Profile.objects.filter(user=instance).first()
 
     if profile:
         if profile.avatar:

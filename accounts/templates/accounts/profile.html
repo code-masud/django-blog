@@ -1,6 +1,7 @@
 
 
   {% extends "base.html" %}
+  {% load socialaccount %}
 
   {% block title %} {{ title }} {% endblock  %}
 
@@ -10,12 +11,22 @@
         <!-- Avatar -->
         {% if request.user.profile.avatar %}
         <img src="{{ request.user.profile.avatar.url }}"
-              class="rounded-circle mx-auto mb-3 profile-avatar"
-              alt="{{ request.user.username }}">
+              alt="{{ request.user.username }}" width="100">
         {% else %}
-          <div class="profile-avatar-placeholder mx-auto mb-3">
-              {{ request.user.username|first|upper }}
-          </div>
+        {% get_social_accounts user as accounts %}
+        {% if accounts.github %}
+            {% for account in accounts.github %}
+                <img src="{{ account.get_avatar_url }}" alt="Github profile image" width="100" srcset="">
+            {% endfor %}
+        {% endif %}
+        {% if accounts.google %}
+            {% for account in accounts.google %}
+                <img src="{{ account.get_avatar_url }}" alt="Google profile image" width="100">
+            {% endfor %}
+        {% endif %}
+        <div class="profile-avatar-placeholder mx-auto mb-3">
+            {{ request.user.username|first|upper }}
+        </div>
         {% endif %}
         <!-- Username -->
         <h4 class="fw-semibold mb-1">
@@ -46,6 +57,11 @@
                 {{ request.user.profile.address }}
             </p>
             {% endif %}
+            <br>
+            <a href="{% url 'account_email' %}" class='btn btn-primary'>Emails</a>
+            <a href="{% url 'account_change_password' %}" class='btn btn-primary'>Change Password</a>
+            <a href="{% url 'socialaccount_connections' %}" class='btn btn-primary'>Socialaccount Connections</a>
+            <a href="{% url 'account_logout' %}" class='btn btn-primary'>Logout</a>
         </div>
       </div>
     </div>
