@@ -11,18 +11,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.utils import timezone
 from django.contrib.messages.views import SuccessMessageMixin
 
+
 class ArticleListView(generic.ListView):
     model = Article
     template_name = 'blog/article_list.html'
     paginate_by = 5
 
     def get_queryset(self):
-        return Article.alive_objects.all()
-    
+        return Article.alive_objects.filter(published_at__isnull=False)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Home'
         return context
+
 
 class ArticleDetailView(generic.DetailView):
     model = Article
@@ -31,8 +33,8 @@ class ArticleDetailView(generic.DetailView):
     slug_url_kwarg = 'slug'
 
     def get_queryset(self):
-        return Article.alive_objects.filter(status=Article.Status.PUBLISHED, published_at__isnull=False)
-    
+        return Article.alive_objects.filter(published_at__isnull=False)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.title
@@ -40,7 +42,8 @@ class ArticleDetailView(generic.DetailView):
         context['alive_tags'] = self.object.tags.filter(is_deleted=False)
         context['form'] = CommentForm()
         return context
-    
+
+
 class ArticleEditView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     model = Article
     form_class = ArticleForm
@@ -55,11 +58,13 @@ class ArticleEditView(LoginRequiredMixin, PermissionRequiredMixin, generic.Updat
         context = super().get_context_data(**kwargs)
         context["title"] = f'Edit: {self.object.title}'
         return context
-    
+
     def form_valid(self, form):
         form.instance.updated_by = self.request.user
-        messages.success(self.request, f'Article "{self.object.title}" updated successfully.')
+        messages.success(
+            self.request, f'Article "{self.object.title}" updated successfully.')
         return super().form_valid(form)
+
 
 class ArticleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, generic.DeleteView):
     model = Article
@@ -70,7 +75,7 @@ class ArticleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMess
 
     def get_queryset(self):
         return Article.alive_objects.all()
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = f'Delete: {self.object.title}'
@@ -99,7 +104,7 @@ class ArticleAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
         context = super().get_context_data(**kwargs)
         context["title"] = 'Add Article'
         return context
-    
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.author = self.request.user
@@ -107,8 +112,8 @@ class ArticleAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
             form.instance.published_at = timezone.now()
         messages.success(self.request, 'Article created successfully.')
         return super().form_valid(form)
-    
-    
+
+
 class CategoryDetailView(generic.DetailView):
     model = Category
     template_name = 'blog/category_detail.html'
@@ -133,7 +138,8 @@ class CategoryDetailView(generic.DetailView):
         context['is_paginated'] = page_obj.has_other_pages()
         context['paginator'] = paginator
         return context
-    
+
+
 class TagDetailView(generic.DetailView):
     model = Tag
     template_name = 'blog/tag_detail.html'
@@ -159,6 +165,7 @@ class TagDetailView(generic.DetailView):
         context['paginator'] = paginator
         return context
 
+
 class SearchView(generic.ListView):
     model = Article
     template_name = 'blog/search_results.html'
@@ -176,13 +183,14 @@ class SearchView(generic.ListView):
                 status=Article.Status.PUBLISHED
             )
         return Article.alive_objects.none()
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q', '')
         context['title'] = f'Search result for "{context['query']}"'
         return context
-    
+
+
 class CommentCreateView(LoginRequiredMixin, generic.CreateView):
     model = Comment
     form_class = CommentForm
@@ -191,14 +199,14 @@ class CommentCreateView(LoginRequiredMixin, generic.CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.article = get_object_or_404(Article, slug=self.kwargs['slug'])
         return super().dispatch(request, *args, **kwargs)
-    
+
     def get_success_url(self):
         return reverse_lazy('blog:article_detail',
-            kwargs={
-                'slug': self.article.slug,
-            }
-        )
-    
+                            kwargs={
+                                'slug': self.article.slug,
+                            }
+                            )
+
     def form_valid(self, form):
         form.instance.article = self.article
         form.instance.user = self.request.user
@@ -206,13 +214,14 @@ class CommentCreateView(LoginRequiredMixin, generic.CreateView):
         form.instance.is_approved = True
         messages.success(self.request, 'Thank you for your comment!')
         return super().form_valid(form)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.article.title
         context['article'] = self.article
         context['form'] = CommentForm()
-        return context 
+        return context
+
 
 class ArticleMonthArchiveView(generic.MonthArchiveView):
     queryset = Article.alive_objects.filter(status=Article.Status.ARCHIVE)
@@ -225,6 +234,7 @@ class ArticleMonthArchiveView(generic.MonthArchiveView):
         context = super().get_context_data(**kwargs)
         context['year'] = self.kwargs['year']
         context['month'] = self.kwargs['month']
-        context['date'] = date(year=self.kwargs['year'], month=self.kwargs['month'], day=1)
+        context['date'] = date(year=self.kwargs['year'],
+                               month=self.kwargs['month'], day=1)
         context['title'] = f'{self.kwargs['month']} {self.kwargs['year']}'
         return context

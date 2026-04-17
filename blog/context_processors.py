@@ -1,20 +1,21 @@
+from django.db.models.functions import TruncYear, TruncMonth, TruncDay
+from .models import Article
+from django.db.models import Count
 from .models import Category
+
 
 def navbar_categories(request):
     categories = Category.alive_objects.filter(is_active=True)
-    return{
+    return {
         'navbar_categories': categories
     }
 
-from django.db.models.functions import TruncYear, TruncMonth, TruncDay
-from django.db.models import Count
-from .models import Article
 
 def archive_menu(request):
     months = (
         Article.alive_objects
         .filter(status=Article.Status.ARCHIVE)
-        .annotate(month=TruncMonth("created_at"))
+        .annotate(month=TruncMonth("published_at"))
         .values("month")
         .annotate(total=Count("id"))
         .order_by("-month")
