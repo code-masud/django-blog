@@ -1,3 +1,4 @@
+        
         <!-- NAVBAR -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
@@ -15,20 +16,35 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <!-- Categories -->
+                    {% load i18n %}
                     <ul class="navbar-nav me-auto">
                         {% for category in navbar_categories %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'blog:category' category.slug %}">{{ category.name }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'blog:category' category.slug %}">{% translate category.name %}</a></li>
                         {% endfor %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:contact' %}">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:contact' %}">{% trans 'Contact' %}</a></li>
+                        <form action="{% url 'set_language' %}" method="post">
+                            {% csrf_token %}
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            <select name="language" id="language">
+                                {% for lang in languages %}
+                                    <option value="{{ lang.code }}" {% if lang.code == LANGUAGE_CODE %} selected {% endif %}>
+                                        {{ lang.name_local }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Go</button>
+                        </form>
                     </ul>
                     <!-- Auth -->
                     <ul class="navbar-nav">
                         {% if request.user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:account_profile' %}">Profile</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:account_profile' %}">{% trans 'Profile' %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">{% trans 'Sign Out' %}</a></li>
                         {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">{% trans 'Sign In' %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">{% trans 'Sign Up' %}</a></li>
                         {% endif %}
                     </ul>
                 </div>
